@@ -422,6 +422,398 @@
             color: #ff0040;
         }
 
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .container {
+                margin: 0;
+                border-radius: 4px;
+                max-width: 100%;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .sync-badge {
+                position: static;
+                margin-bottom: 15px;
+                justify-content: center;
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .sync-setup, .add-form {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+
+            .sync-setup h2 {
+                font-size: 1.2rem;
+                text-align: center;
+            }
+
+            .sync-setup p {
+                font-size: 0.9rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .token-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .token-input, .form-input, .search-input {
+                min-width: auto;
+                padding: 12px 15px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn-small {
+                padding: 8px 12px;
+                font-size: 12px;
+                width: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .sync-buttons {
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .sync-controls {
+                justify-content: center;
+            }
+
+            .link-card {
+                padding: 15px;
+            }
+
+            .link-title {
+                font-size: 1.2rem;
+            }
+
+            .link-url {
+                font-size: 0.9rem;
+            }
+
+            .link-actions {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .link-buttons {
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .link-date {
+                text-align: center;
+                font-size: 0.8rem;
+            }
+
+            .toast {
+                right: 10px;
+                left: 10px;
+                top: 20px;
+                transform: translateY(-100px);
+            }
+
+            .toast.show {
+                transform: translateY(0);
+            }
+
+            .toast.success {
+                background: #0d1117;
+                border-color: #00ff41;
+                color: #00ff41;
+            }
+
+            .toast.error {
+                background: #0d1117;
+                border-color: #ff0040;
+                color: #ff0040;
+            }
+
+            @media (max-width: 480px) {
+                body {
+                    padding: 10px;
+                    font-size: 14px;
+                }
+
+                .container {
+                    margin: 0;
+                    border-radius: 4px;
+                    max-width: 100%;
+                }
+
+                .header {
+                    padding: 20px 15px;
+                }
+
+                .header h1 {
+                    font-size: 1.8rem;
+                    letter-spacing: 1px;
+                }
+
+                .header p {
+                    font-size: 1rem;
+                }
+
+                .sync-badge {
+                    position: static;
+                    margin-bottom: 15px;
+                    justify-content: center;
+                    font-size: 0.8rem;
+                    padding: 8px 12px;
+                }
+
+                .main-content {
+                    padding: 15px;
+                }
+
+                .sync-setup, .add-form {
+                    padding: 20px 15px;
+                    margin-bottom: 20px;
+                }
+
+                .sync-setup h2 {
+                    font-size: 1.2rem;
+                    text-align: center;
+                }
+
+                .sync-setup p {
+                    font-size: 0.9rem;
+                }
+
+                .form-row {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+
+                .token-container {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .token-input, .form-input, .search-input {
+                    min-width: auto;
+                    padding: 12px 15px;
+                    font-size: 16px;
+                }
+
+                .btn {
+                    padding: 12px 20px;
+                    font-size: 14px;
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .btn-small {
+                    padding: 8px 12px;
+                    font-size: 12px;
+                    width: auto;
+                }
+
+                .form-actions {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: stretch;
+                }
+
+                .sync-buttons {
+                    justify-content: center;
+                    gap: 8px;
+                }
+
+                .sync-controls {
+                    justify-content: center;
+                }
+
+                .link-card {
+                    padding: 15px;
+                }
+
+                .link-title {
+                    font-size: 1.2rem;
+                }
+
+                .link-url {
+                    font-size: 0.9rem;
+                }
+
+                .link-actions {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: stretch;
+                }
+
+                .link-buttons {
+                    justify-content: center;
+                    gap: 8px;
+                }
+
+                .link-date {
+                    text-align: center;
+                    font-size: 0.8rem;
+                }
+
+                .toast {
+                    right: 10px;
+                    left: 10px;
+                    top: 20px;
+                    transform: translateY(-100px);
+                }
+
+                .toast.show {
+                    transform: translateY(0);
+                }
+            }
+
+            /* Tablet styles */
+            @media (min-width: 481px) and (max-width: 768px) {
+                body {
+                    padding: 15px;
+                }
+
+                .container {
+                    margin: 0;
+                    border-radius: 6px;
+                }
+
+                .header {
+                    padding: 25px 20px;
+                }
+
+                .header h1 {
+                    font-size: 2.2rem;
+                }
+
+                .sync-badge {
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    font-size: 0.85rem;
+                }
+
+                .main-content {
+                    padding: 25px 20px;
+                }
+
+                .sync-setup, .add-form {
+                    padding: 25px 20px;
+                }
+
+                .form-row {
+                    flex-direction: column;
+                    gap: 18px;
+                }
+
+                .token-container {
+                    flex-wrap: wrap;
+                    gap: 12px;
+                }
+
+                .token-input {
+                    min-width: 250px;
+                    flex: 1;
+                }
+
+                .form-actions {
+                    flex-wrap: wrap;
+                    gap: 12px;
+                }
+
+                .link-actions {
+                    flex-wrap: wrap;
+                    gap: 12px;
+                }
+            }
+
+            /* Desktop styles */
+            @media (min-width: 769px) and (max-width: 1024px) {
+                .container {
+                    max-width: 800px;
+                }
+
+                .header {
+                    padding: 35px 30px;
+                }
+
+                .main-content {
+                    padding: 35px 30px;
+                }
+        }
+
+        @media (min-width: 1025px) {
+            .container {
+                max-width: 900px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .sync-setup, .add-form {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .btn, .form-input, .token-input, .search-input {
+                border-width: 1px;
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -551,7 +943,7 @@
         // Default sync configuration (obfuscated)
         var defaultConfig = {
             // Replace these with your actual values (base64 encoded for basic obfuscation)
-            token: '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', // base64 encoded token
+            token: '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', // base64 encoded token
             gistId: '' // base64 encoded gist ID (optional)
         };
 
@@ -997,13 +1389,21 @@
                 updateStatus('syncing', 'Connecting to default sync...');
                 
                 try {
-                    // Test the token
+                    // Test the token with detailed error handling
                     const response = await fetch('https://api.github.com/user', {
                         headers: { 'Authorization': `token ${decodedToken}` }
                     });
 
                     if (!response.ok) {
-                        throw new Error('Invalid default token');
+                        let errorMessage = 'Invalid default token';
+                        if (response.status === 401) {
+                            errorMessage = 'Default token expired or revoked';
+                        } else if (response.status === 403) {
+                            errorMessage = 'Default token lacks required permissions';
+                        } else if (response.status === 404) {
+                            errorMessage = 'GitHub API not accessible';
+                        }
+                        throw new Error(errorMessage);
                     }
 
                     appGithubToken = decodedToken;
