@@ -43,6 +43,7 @@
     .bot {
       color: #ff0;
     }
+
     .deleteBtn {
       background: transparent;
       border: 1px solid red;
@@ -65,6 +66,9 @@
       color: #0f0;
       border: 1px solid #0f0;
       font-size: 16px;
+    }
+    a {
+        color: #0f0;
     }
     #sendBtn {
       background: black;
@@ -123,7 +127,7 @@
         const div = document.createElement("div");
         div.classList.add("msg");
         let cls = msg.sender === "bot" ? "bot" : "user";
-        div.innerHTML = `${msg.text}`;
+        div.innerHTML = `<a href="url">`+msg.text+`</a>`;
 
         // Delete button
         const delBtn = document.createElement("button");
