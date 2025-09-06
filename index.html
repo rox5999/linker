@@ -3,1439 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkSync - Cross-Device Link Manager</title>
+    <title>Telegram Message Interface</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%);
-            min-height: 100vh;
-            padding: 20px;
-            line-height: 1.6;
-            color: #00ff41;
-        }
-
-        .container {
-            max-width: 900px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
-            background: #0d1117;
-            border: 2px solid #00ff41;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1);
-            overflow: hidden;
+            padding: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
         }
-
-        .header {
-            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-            color: #00ff41;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            border-bottom: 2px solid #00ff41;
-        }
-
-        .header h1 {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px #00ff41;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        .header p {
-            opacity: 0.8;
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: #58a6ff;
-        }
-
-        .sync-badge {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            background: rgba(0, 255, 65, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 10px 16px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid #00ff41;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ff0040;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 5px currentColor;
-        }
-
-        .status-dot.connected {
-            background: #00ff41;
-        }
-
-        .status-dot.syncing {
-            background: #ffff00;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #00ff41; }
-            to { text-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; }
-        }
-
-        .main-content {
-            padding: 40px;
-            background: #0d1117;
-        }
-
-        .sync-setup {
-            background: linear-gradient(135deg, #161b22 0%, #21262d 100%);
-            border: 2px solid #00ff41;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-        }
-
-        .sync-setup h2 {
-            color: #00ff41;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-shadow: 0 0 5px #00ff41;
-        }
-
-        .sync-setup p {
-            color: #58a6ff;
-            margin-bottom: 15px;
-            font-size: 1rem;
-        }
-
-        .token-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .token-input {
-            flex: 1;
-            min-width: 300px;
-            padding: 15px 20px;
-            border: 2px solid #00ff41;
-            border-radius: 4px;
-            font-size: 16px;
-            background: #0d1117;
-            color: #00ff41;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s ease;
-        }
-
-        .token-input:focus {
-            outline: none;
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 4px rgba(0, 255, 65, 0.2);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #00ff41 0%, #00cc33 100%);
-            color: #0d1117;
-            border: 2px solid #00ff41;
-            padding: 15px 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: 'Courier New', monospace;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
-            text-shadow: 0 0 5px #0d1117;
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #00ff41 0%, #00cc33 100%);
-            color: #0d1117;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff0040 0%, #cc0033 100%);
-            color: #ffffff;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #58a6ff 0%, #4080ff 100%);
-            color: #0d1117;
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 8px;
-        }
-
-        .sync-controls {
-            display: none;
-            gap: 15px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        .sync-controls.active {
-            display: flex;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .sync-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .gist-info {
-            margin-top: 20px;
+        .config-panel {
+            background-color: #1e1e1e;
             padding: 15px;
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px solid #00ff41;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            color: #00ff41;
-        }
-
-        .add-form {
-            background: #161b22;
-            border: 2px solid #00ff41;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            flex: 1;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #00ff41;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 15px 18px;
-            border: 2px solid #00ff41;
-            border-radius: 4px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #0d1117;
-            color: #00ff41;
-            font-family: 'Courier New', monospace;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #58a6ff;
-            background: #0d1117;
-            box-shadow: 0 0 0 4px rgba(0, 255, 65, 0.2);
-        }
-
-        .search-container {
-            margin-bottom: 30px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 18px 25px;
-            border: 2px solid #00ff41;
-            border-radius: 4px;
-            font-size: 16px;
-            background: #0d1117;
-            color: #00ff41;
-            font-family: 'Courier New', monospace;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #58a6ff;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-        }
-
-        .links-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .link-card {
-            background: #161b22;
-            border: 2px solid #00ff41;
-            border-radius: 8px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
-        }
-
-        .link-card:hover {
-            border-color: #58a6ff;
-            transform: translateY(-4px);
-            box-shadow: 0 0 25px rgba(0, 255, 65, 0.3);
-        }
-
-        .link-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #00ff41;
-            margin-bottom: 10px;
-            line-height: 1.3;
-            text-shadow: 0 0 5px #00ff41;
-        }
-
-        .link-url {
-            color: #58a6ff;
-            text-decoration: none;
-            font-size: 1rem;
-            word-break: break-all;
             margin-bottom: 20px;
-            display: block;
-            font-weight: 500;
-            font-family: 'Courier New', monospace;
+            border-radius: 5px;
         }
-
-        .link-url:hover {
-            text-decoration: underline;
-            text-shadow: 0 0 5px #58a6ff;
+        .config-panel input {
+            padding: 8px;
+            margin: 5px;
+            width: 300px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border: 1px solid #444;
         }
-
-        .link-actions {
+        .config-panel button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .send-form {
+            margin-bottom: 20px;
             display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
         }
-
-        .link-buttons {
-            display: flex;
-            gap: 10px;
+        #messageInput {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border: 1px solid #444;
         }
-
-        .link-date {
-            color: #58a6ff;
-            font-size: 0.85rem;
-            font-weight: 500;
-            font-family: 'Courier New', monospace;
+        #sendBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
-
-        .empty-state {
-            text-align: center;
-            padding: 80px 40px;
-            color: #58a6ff;
+        #sendBtn:hover {
+            background-color: #45a049;
         }
-
-        .empty-state h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: #00ff41;
-            text-shadow: 0 0 10px #00ff41;
+        .message {
+            padding: 10px;
+            margin-bottom: 5px;
+            position: relative;
         }
-
-        .empty-state p {
-            font-size: 1.1rem;
-            color: #58a6ff;
+        .message:nth-child(odd) {
+            background-color: #2d2d2d; /* Dark gray */
         }
-
-        .toast {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: #0d1117;
-            color: #00ff41;
-            padding: 16px 24px;
-            border: 2px solid #00ff41;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-            z-index: 1000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            font-family: 'Courier New', monospace;
+        .message:nth-child(even) {
+            background-color: #3d3d3d; /* Slightly lighter gray */
         }
-
-        .toast.show {
-            transform: translateX(0);
+        .timestamp {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
         }
-
-        .toast.success {
-            background: #0d1117;
-            border-color: #00ff41;
-            color: #00ff41;
+        .error {
+            color: #f44336;
+            margin: 10px 0;
         }
-
-        .toast.error {
-            background: #0d1117;
-            border-color: #ff0040;
-            color: #ff0040;
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 3px;
         }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-                font-size: 14px;
-            }
-
-            .container {
-                margin: 0;
-                border-radius: 4px;
-                max-width: 100%;
-            }
-
-            .header {
-                padding: 20px 15px;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-                letter-spacing: 1px;
-            }
-
-            .header p {
-                font-size: 1rem;
-            }
-
-            .sync-badge {
-                position: static;
-                margin-bottom: 15px;
-                justify-content: center;
-                font-size: 0.8rem;
-                padding: 8px 12px;
-            }
-
-            .main-content {
-                padding: 15px;
-            }
-
-            .sync-setup, .add-form {
-                padding: 20px 15px;
-                margin-bottom: 20px;
-            }
-
-            .sync-setup h2 {
-                font-size: 1.2rem;
-                text-align: center;
-            }
-
-            .sync-setup p {
-                font-size: 0.9rem;
-            }
-
-            .form-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .token-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .token-input, .form-input, .search-input {
-                min-width: auto;
-                padding: 12px 15px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
-                width: 100%;
-                justify-content: center;
-            }
-
-            .btn-small {
-                padding: 8px 12px;
-                font-size: 12px;
-                width: auto;
-            }
-
-            .form-actions {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
-
-            .sync-buttons {
-                justify-content: center;
-                gap: 8px;
-            }
-
-            .sync-controls {
-                justify-content: center;
-            }
-
-            .link-card {
-                padding: 15px;
-            }
-
-            .link-title {
-                font-size: 1.2rem;
-            }
-
-            .link-url {
-                font-size: 0.9rem;
-            }
-
-            .link-actions {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
-
-            .link-buttons {
-                justify-content: center;
-                gap: 8px;
-            }
-
-            .link-date {
-                text-align: center;
-                font-size: 0.8rem;
-            }
-
-            .toast {
-                right: 10px;
-                left: 10px;
-                top: 20px;
-                transform: translateY(-100px);
-            }
-
-            .toast.show {
-                transform: translateY(0);
-            }
-
-            .toast.success {
-                background: #0d1117;
-                border-color: #00ff41;
-                color: #00ff41;
-            }
-
-            .toast.error {
-                background: #0d1117;
-                border-color: #ff0040;
-                color: #ff0040;
-            }
-
-            @media (max-width: 480px) {
-                body {
-                    padding: 10px;
-                    font-size: 14px;
-                }
-
-                .container {
-                    margin: 0;
-                    border-radius: 4px;
-                    max-width: 100%;
-                }
-
-                .header {
-                    padding: 20px 15px;
-                }
-
-                .header h1 {
-                    font-size: 1.8rem;
-                    letter-spacing: 1px;
-                }
-
-                .header p {
-                    font-size: 1rem;
-                }
-
-                .sync-badge {
-                    position: static;
-                    margin-bottom: 15px;
-                    justify-content: center;
-                    font-size: 0.8rem;
-                    padding: 8px 12px;
-                }
-
-                .main-content {
-                    padding: 15px;
-                }
-
-                .sync-setup, .add-form {
-                    padding: 20px 15px;
-                    margin-bottom: 20px;
-                }
-
-                .sync-setup h2 {
-                    font-size: 1.2rem;
-                    text-align: center;
-                }
-
-                .sync-setup p {
-                    font-size: 0.9rem;
-                }
-
-                .form-row {
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                .token-container {
-                    flex-direction: column;
-                    gap: 10px;
-                }
-
-                .token-input, .form-input, .search-input {
-                    min-width: auto;
-                    padding: 12px 15px;
-                    font-size: 16px;
-                }
-
-                .btn {
-                    padding: 12px 20px;
-                    font-size: 14px;
-                    width: 100%;
-                    justify-content: center;
-                }
-
-                .btn-small {
-                    padding: 8px 12px;
-                    font-size: 12px;
-                    width: auto;
-                }
-
-                .form-actions {
-                    flex-direction: column;
-                    gap: 10px;
-                    align-items: stretch;
-                }
-
-                .sync-buttons {
-                    justify-content: center;
-                    gap: 8px;
-                }
-
-                .sync-controls {
-                    justify-content: center;
-                }
-
-                .link-card {
-                    padding: 15px;
-                }
-
-                .link-title {
-                    font-size: 1.2rem;
-                }
-
-                .link-url {
-                    font-size: 0.9rem;
-                }
-
-                .link-actions {
-                    flex-direction: column;
-                    gap: 10px;
-                    align-items: stretch;
-                }
-
-                .link-buttons {
-                    justify-content: center;
-                    gap: 8px;
-                }
-
-                .link-date {
-                    text-align: center;
-                    font-size: 0.8rem;
-                }
-
-                .toast {
-                    right: 10px;
-                    left: 10px;
-                    top: 20px;
-                    transform: translateY(-100px);
-                }
-
-                .toast.show {
-                    transform: translateY(0);
-                }
-            }
-
-            /* Tablet styles */
-            @media (min-width: 481px) and (max-width: 768px) {
-                body {
-                    padding: 15px;
-                }
-
-                .container {
-                    margin: 0;
-                    border-radius: 6px;
-                }
-
-                .header {
-                    padding: 25px 20px;
-                }
-
-                .header h1 {
-                    font-size: 2.2rem;
-                }
-
-                .sync-badge {
-                    position: absolute;
-                    top: 15px;
-                    right: 20px;
-                    font-size: 0.85rem;
-                }
-
-                .main-content {
-                    padding: 25px 20px;
-                }
-
-                .sync-setup, .add-form {
-                    padding: 25px 20px;
-                }
-
-                .form-row {
-                    flex-direction: column;
-                    gap: 18px;
-                }
-
-                .token-container {
-                    flex-wrap: wrap;
-                    gap: 12px;
-                }
-
-                .token-input {
-                    min-width: 250px;
-                    flex: 1;
-                }
-
-                .form-actions {
-                    flex-wrap: wrap;
-                    gap: 12px;
-                }
-
-                .link-actions {
-                    flex-wrap: wrap;
-                    gap: 12px;
-                }
-            }
-
-            /* Desktop styles */
-            @media (min-width: 769px) and (max-width: 1024px) {
-                .container {
-                    max-width: 800px;
-                }
-
-                .header {
-                    padding: 35px 30px;
-                }
-
-                .main-content {
-                    padding: 35px 30px;
-                }
+        .delete-btn:hover {
+            background-color: #d32f2f;
         }
-
-        @media (min-width: 1025px) {
-            .container {
-                max-width: 900px;
-            }
-        }
-
-        @media (max-height: 500px) and (orientation: landscape) {
-            .header {
-                padding: 15px 20px;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-                margin-bottom: 5px;
-            }
-
-            .header p {
-                font-size: 1rem;
-            }
-
-            .main-content {
-                padding: 20px;
-            }
-
-            .sync-setup, .add-form {
-                padding: 20px;
-                margin-bottom: 15px;
-            }
-        }
-
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .btn, .form-input, .token-input, .search-input {
-                border-width: 1px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 15px;
-            }
-
-            .header {
-                padding: 30px 20px;
-            }
-
-            .header h1 {
-                font-size: 2.2rem;
-            }
-
-            .main-content {
-                padding: 25px;
-            }
-
-            .form-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .token-container {
-                flex-direction: column;
-            }
-
-            .sync-controls {
-                flex-direction: column;
-            }
-
-            .link-actions {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .sync-badge {
-                position: static;
-                margin-top: 20px;
-                align-self: center;
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
+        .message-content {
+            padding-right: 60px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="sync-badge">
-                <div class="status-dot" id="statusDot"></div>
-                <span id="statusText">Offline</span>
-            </div>
-            <h1>🔗 LinkSync</h1>
-            <p>Your links, synced across all devices</p>
+    <h1>Telegram Messages</h1>
+    
+    <div class="config-panel" id="configPanel">
+        <h3>Enter your Telegram credentials:</h3>
+        <div>
+            <input type="text" id="botTokenInput" placeholder="Bot Token" value="6210869613:AAEn0TxnTrZ-j_xvqEls7mz3CjtbiQA3e40">
         </div>
-
-        <div class="main-content">
-            <div class="sync-setup" id="syncSetup">
-                <h2><span id="syncIcon" onclick="handleMobileAccess()" style="cursor: pointer;">🔄</span> Setup Cross-Device Sync</h2>
-                <p><strong>Step 1:</strong> Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Personal Access Tokens</a></p>
-                <p><strong>Step 2:</strong> Click "Generate new token (classic)" and select <strong>"gist"</strong> scope only</p>
-                <p><strong>Step 3:</strong> Copy the token and paste it below:</p>
-                
-                <div class="token-container">
-                    <input type="password" class="token-input" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-                    <button class="btn" onclick="setupSync()">🚀 Connect</button>
-                    <button class="btn btn-secondary btn-small" id="defaultSyncBtn" onclick="useDefaultSync()" style="display: none;">🔑 Use Default</button>
-                </div>
-
-                <div class="sync-controls" id="syncControls">
-                    <button class="btn btn-danger btn-small" onclick="resetSync()">🗑️ Reset</button>
-                </div>
-
-                <div class="gist-info" id="gistInfo" style="display: none;"></div>
-            </div>
-
-            <div class="add-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Link Title</label>
-                        <input type="text" class="form-input" id="titleInput" placeholder="My awesome website">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">URL</label>
-                        <input type="url" class="form-input" id="urlInput" placeholder="https://example.com">
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button class="btn" onclick="addLink()">➕ Add Link</button>
-                    <div class="sync-buttons" id="syncButtons" style="display: none;">
-                        <button class="btn btn-success btn-small" onclick="uploadLinks()">📤 Upload</button>
-                        <button class="btn btn-secondary btn-small" onclick="downloadLinks()">📥 Download</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search your links..." oninput="searchLinks()">
-            </div>
-
-            <div class="links-grid" id="linksContainer"></div>
+        <div>
+            <input type="text" id="chatIdInput" placeholder="Chat ID" value="7862186480">
         </div>
+        <button id="saveConfigBtn">Save</button>
+    </div>
+    
+    <div class="send-form">
+        <input type="text" id="messageInput" placeholder="Type your message here...">
+        <button id="sendBtn">Send</button>
+    </div>
+    
+    <div id="messagesContainer">
+        <!-- Messages will be displayed here -->
     </div>
 
     <script>
-        // App State
-        var appLinks = JSON.parse(localStorage.getItem('linkSync_links')) || [];
-        var appGithubToken = localStorage.getItem('linkSync_token') || '';
-        var appGistId = localStorage.getItem('linkSync_gistId') || '';
-        var appEditingIndex = -1;
-
-        // Default sync configuration (obfuscated)
-        var defaultConfig = {
-            // Replace these with your actual values (base64 encoded for basic obfuscation)
-            token: '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', // base64 encoded token
-            gistId: '' // base64 encoded gist ID (optional)
-        };
-
-        // Mobile access tracking
-        var mobileClickCount = 0;
-        var mobileClickTimer = null;
-
-        // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
-            renderLinks();
-            initializeSync();
+            const configPanel = document.getElementById('configPanel');
+            const botTokenInput = document.getElementById('botTokenInput');
+            const chatIdInput = document.getElementById('chatIdInput');
+            const saveConfigBtn = document.getElementById('saveConfigBtn');
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const messagesContainer = document.getElementById('messagesContainer');
             
-            // Auto-focus title input
-            document.getElementById('titleInput').focus();
+            let botToken = localStorage.getItem('telegramBotToken');
+            let chatId = localStorage.getItem('telegramChatId');
+            let lastUpdateId = localStorage.getItem('lastUpdateId') || 0;
+            let sentMessages = JSON.parse(localStorage.getItem('sentMessages') || '[]');
             
-            // Enter key handlers
-            document.getElementById('titleInput').addEventListener('keypress', handleEnter);
-            document.getElementById('urlInput').addEventListener('keypress', handleEnter);
-            
-            // Keyboard shortcut to reveal default sync button
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-                    e.preventDefault();
-                    toggleDefaultSyncButton();
-                }
-            });
-        });
-
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                addLink();
-            }
-        }
-
-        // Sync Functions
-        function initializeSync() {
-            if (appGithubToken) {
-                document.getElementById('syncSetup').style.display = 'none';
-                document.getElementById('syncButtons').style.display = 'flex';
-                updateStatus('connected', 'Connected');
-                loadFromCloud();
+            // Check if we have credentials stored
+            if (botToken && chatId) {
+                configPanel.style.display = 'none';
+                fetchMessages();
             } else {
-                updateStatus('offline', 'Setup Required');
-                document.getElementById('syncButtons').style.display = 'none';
+                // Ask for credentials
+                configPanel.style.display = 'block';
             }
-        }
-
-        async function setupSync() {
-            const token = document.getElementById('tokenInput').value.trim();
-            if (!token) {
-                showToast('Please enter your GitHub token', 'error');
-                return;
-            }
-
-            updateStatus('syncing', 'Connecting...');
             
-            try {
-                // Test token and find/create gist
-                const response = await fetch('https://api.github.com/user', {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Invalid token');
-                }
-
-                appGithubToken = token;
-                localStorage.setItem('linkSync_token', token);
-
-                await findOrCreateGist();
+            // Save configuration
+            saveConfigBtn.addEventListener('click', function() {
+                botToken = botTokenInput.value.trim();
+                chatId = chatIdInput.value.trim();
                 
-                document.getElementById('syncControls').classList.add('active');
-                document.getElementById('syncButtons').style.display = 'flex';
-                document.getElementById('gistInfo').style.display = 'block';
-                document.getElementById('gistInfo').textContent = `Gist ID: ${appGistId}`;
-                
-                updateStatus('connected', 'Connected');
-                showToast('Sync setup successful!', 'success');
-                
-                // Upload current links
-                if (appLinks.length > 0) {
-                    await uploadLinks();
-                }
-                
-            } catch (error) {
-                updateStatus('offline', 'Connection Failed');
-                showToast(`Setup failed: ${error.message}`, 'error');
-                console.error('Setup error:', error);
-            }
-        }
-
-        async function findOrCreateGist() {
-            // Try to find existing gist
-            const gistsResponse = await fetch('https://api.github.com/gists', {
-                headers: { 'Authorization': `token ${appGithubToken}` }
-            });
-
-            if (gistsResponse.ok) {
-                const gists = await gistsResponse.json();
-                const existingGist = gists.find(g => g.files && g.files['linksync-data.json']);
-                
-                if (existingGist) {
-                    appGistId = existingGist.id;
-                    localStorage.setItem('linkSync_gistId', appGistId);
-                    return;
-                }
-            }
-
-            // Create new gist
-            const createResponse = await fetch('https://api.github.com/gists', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `token ${appGithubToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    description: 'LinkSync - Cross-Device Link Storage',
-                    public: false,
-                    files: {
-                        'linksync-data.json': {
-                            content: JSON.stringify({
-                                links: appLinks,
-                                lastUpdated: new Date().toISOString()
-                            }, null, 2)
-                        }
-                    }
-                })
-            });
-
-            if (!createResponse.ok) {
-                throw new Error('Failed to create storage');
-            }
-
-            const newGist = await createResponse.json();
-            appGistId = newGist.id;
-            localStorage.setItem('linkSync_gistId', appGistId);
-        }
-
-        async function uploadLinks() {
-            if (!appGithubToken || !appGistId) return;
-            
-            updateStatus('syncing', 'Uploading...');
-            
-            try {
-                const response = await fetch(`https://api.github.com/gists/${appGistId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `token ${appGithubToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        files: {
-                            'linksync-data.json': {
-                                content: JSON.stringify({
-                                    links: appLinks,
-                                    lastUpdated: new Date().toISOString()
-                                }, null, 2)
-                            }
-                        }
-                    })
-                });
-
-                if (response.ok) {
-                    updateStatus('connected', 'Synced');
-                    showToast('Links uploaded successfully!', 'success');
+                if (botToken && chatId) {
+                    localStorage.setItem('telegramBotToken', botToken);
+                    localStorage.setItem('telegramChatId', chatId);
+                    configPanel.style.display = 'none';
+                    fetchMessages();
                 } else {
-                    throw new Error('Upload failed');
+                    alert('Please enter both Bot Token and Chat ID');
                 }
-            } catch (error) {
-                updateStatus('connected', 'Upload Failed');
-                showToast('Failed to upload links', 'error');
-                console.error('Upload error:', error);
-            }
-        }
-
-        async function downloadLinks() {
-            if (!appGithubToken || !appGistId) return;
+            });
             
-            updateStatus('syncing', 'Downloading...');
-            
-            try {
-                const response = await fetch(`https://api.github.com/gists/${appGistId}`, {
-                    headers: { 'Authorization': `token ${appGithubToken}` }
-                });
-
-                if (response.ok) {
-                    const gist = await response.json();
-                    const fileContent = gist.files['linksync-data.json'].content;
-                    const data = JSON.parse(fileContent);
-                    
-                    appLinks = data.links || [];
-                    saveLinks();
-                    renderLinks();
-                    
-                    updateStatus('connected', 'Synced');
-                    showToast('Links downloaded successfully!', 'success');
-                } else {
-                    throw new Error('Download failed');
-                }
-            } catch (error) {
-                updateStatus('connected', 'Download Failed');
-                showToast('Failed to download links', 'error');
-                console.error('Download error:', error);
-            }
-        }
-
-        async function loadFromCloud() {
-            if (appGistId) {
-                await downloadLinks();
-            }
-        }
-
-        function resetSync() {
-            if (confirm('This will disconnect sync but keep your local links. Continue?')) {
-                localStorage.removeItem('linkSync_token');
-                localStorage.removeItem('linkSync_gistId');
-                appGithubToken = '';
-                appGistId = '';
-                
-                document.getElementById('tokenInput').value = '';
-                document.getElementById('syncControls').classList.remove('active');
-                document.getElementById('syncButtons').style.display = 'none';
-                document.getElementById('gistInfo').style.display = 'none';
-                document.getElementById('syncSetup').style.display = 'block';
-                
-                updateStatus('offline', 'Disconnected');
-                showToast('Sync disconnected', 'success');
-            }
-        }
-
-        // Link Management
-        function addLink() {
-            const title = document.getElementById('titleInput').value.trim();
-            const url = document.getElementById('urlInput').value.trim();
-
-            if (!title || !url) {
-                showToast('Please fill in both fields', 'error');
-                return;
-            }
-
-            if (!isValidUrl(url)) {
-                showToast('Please enter a valid URL', 'error');
-                return;
-            }
-
-            const link = {
-                id: Date.now(),
-                title: title,
-                url: url,
-                dateAdded: new Date().toLocaleDateString()
-            };
-
-            if (appEditingIndex >= 0) {
-                appLinks[appEditingIndex] = { ...appLinks[appEditingIndex], title, url };
-                appEditingIndex = -1;
-            } else {
-                appLinks.unshift(link);
-            }
-
-            saveLinks();
-            renderLinks();
-            clearForm();
-            
-            // Auto-upload if connected
-            if (appGithubToken && appGistId) {
-                uploadLinks();
-            }
-        }
-
-        function editLink(index) {
-            const link = appLinks[index];
-            document.getElementById('titleInput').value = link.title;
-            document.getElementById('urlInput').value = link.url;
-            appEditingIndex = index;
-            document.getElementById('titleInput').focus();
-        }
-
-        function deleteLink(index) {
-            if (confirm('Delete this link?')) {
-                appLinks.splice(index, 1);
-                saveLinks();
-                renderLinks();
-                
-                // Auto-upload if connected
-                if (appGithubToken && appGistId) {
-                    uploadLinks();
-                }
-            }
-        }
-
-        function searchLinks() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = appLinks.filter(link => 
-                link.title.toLowerCase().includes(query) || 
-                link.url.toLowerCase().includes(query)
-            );
-            renderLinks(filtered);
-        }
-
-        function renderLinks(linksToShow = appLinks) {
-            const container = document.getElementById('linksContainer');
-            
-            if (linksToShow.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No links yet!</h3>
-                        <p>Add your first link using the form above</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = linksToShow.map((link, index) => {
-                const actualIndex = appLinks.findIndex(l => l.id === link.id);
-                return `
-                    <div class="link-card fade-in">
-                        <div class="link-title">${escapeHtml(link.title)}</div>
-                        <a href="${escapeHtml(link.url)}" target="_blank" class="link-url">${escapeHtml(link.url)}</a>
-                        <div class="link-actions">
-                            <div class="link-buttons">
-                                <button class="btn btn-secondary btn-small" onclick="editLink(${actualIndex})">✏️ Edit</button>
-                                <button class="btn btn-danger btn-small" onclick="deleteLink(${actualIndex})">🗑️ Delete</button>
-                            </div>
-                            <div class="link-date">Added: ${link.dateAdded}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Utility Functions
-        function saveLinks() {
-            localStorage.setItem('linkSync_links', JSON.stringify(appLinks));
-        }
-
-        function clearForm() {
-            document.getElementById('titleInput').value = '';
-            document.getElementById('urlInput').value = '';
-            appEditingIndex = -1;
-        }
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function updateStatus(status, text) {
-            const dot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            
-            dot.className = `status-dot ${status}`;
-            statusText.textContent = text;
-        }
-
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
-        }
-
-        // Default sync functions
-        function toggleDefaultSyncButton() {
-            const btn = document.getElementById('defaultSyncBtn');
-            if (btn.style.display === 'none') {
-                btn.style.display = 'inline-flex';
-                showToast('Default sync option revealed!', 'success');
-            } else {
-                btn.style.display = 'none';
-            }
-        }
-
-        function handleMobileAccess() {
-            mobileClickCount++;
-            
-            // Reset timer on each click
-            if (mobileClickTimer) {
-                clearTimeout(mobileClickTimer);
-            }
-            
-            // Reset count after 3 seconds of no clicks
-            mobileClickTimer = setTimeout(() => {
-                mobileClickCount = 0;
-            }, 3000);
-            
-            // Show feedback for clicks
-            if (mobileClickCount < 5) {
-                const remaining = 5 - mobileClickCount;
-            }
-            
-            // Reveal button after 5 clicks
-            if (mobileClickCount >= 5) {
-                toggleDefaultSyncButton();
-                mobileClickCount = 0;
-                clearTimeout(mobileClickTimer);
-            }
-        }
-
-        function decodeBase64(str) {
-            try {
-                return atob(str);
-            } catch (e) {
-                console.error('Failed to decode base64:', e);
-                return '';
-            }
-        }
-
-        async function useDefaultSync() {
-            if (confirm('Use default sync configuration? This will connect to a shared gist.')) {
-                // Handle both base64 encoded and plaintext tokens
-                let decodedToken = defaultConfig.token;
-                let decodedGistId = defaultConfig.gistId;
-                
-                // Try to decode as base64, if it fails, use as plaintext
-                if (defaultConfig.token.length > 50 && !defaultConfig.token.startsWith('ghp_')) {
-                    decodedToken = decodeBase64(defaultConfig.token);
-                }
-                if (defaultConfig.gistId && defaultConfig.gistId.length > 20 && !defaultConfig.gistId.match(/^[a-f0-9]+$/)) {
-                    decodedGistId = decodeBase64(defaultConfig.gistId);
-                }
-                
-                if (!decodedToken) {
-                    showToast('Invalid default configuration', 'error');
-                    return;
-                }
-
-                updateStatus('syncing', 'Connecting to default sync...');
+            // Function to fetch messages from Telegram
+            async function fetchMessages() {
+                if (!botToken || !chatId) return;
                 
                 try {
-                    // Test the token with detailed error handling
-                    const response = await fetch('https://api.github.com/user', {
-                        headers: { 'Authorization': `token ${decodedToken}` }
-                    });
-
-                    if (!response.ok) {
-                        let errorMessage = 'Invalid default token';
-                        if (response.status === 401) {
-                            errorMessage = 'Default token expired or revoked';
-                        } else if (response.status === 403) {
-                            errorMessage = 'Default token lacks required permissions';
-                        } else if (response.status === 404) {
-                            errorMessage = 'GitHub API not accessible';
-                        }
-                        throw new Error(errorMessage);
-                    }
-
-                    appGithubToken = decodedToken;
-                    localStorage.setItem('linkSync_token', decodedToken);
-
-                    // Use provided gist ID or find/create one
-                    if (decodedGistId && decodedGistId !== 'abcdefghijk') {
-                        appGistId = decodedGistId;
-                        localStorage.setItem('linkSync_gistId', decodedGistId);
+                    // Using Telegram's getUpdates API with offset to get only new messages
+                    const response = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=${lastUpdateId + 1}`);
+                    const data = await response.json();
+                    
+                    if (data.ok) {
+                        processMessages(data.result);
                     } else {
-                        await findOrCreateGist();
+                        showError('Error fetching messages: ' + data.description);
                     }
-                    
-                    document.getElementById('syncSetup').style.display = 'none';
-                    document.getElementById('syncControls').classList.add('active');
-                    document.getElementById('syncButtons').style.display = 'flex';
-                    document.getElementById('gistInfo').style.display = 'block';
-                    document.getElementById('gistInfo').textContent = `Default Gist ID: ${appGistId}`;
-                    
-                    updateStatus('connected', 'Connected (Default)');
-                    showToast('Connected using default sync!', 'success');
-                    
-                    // Load existing data from cloud
-                    await loadFromCloud();
-                    
                 } catch (error) {
-                    updateStatus('offline', 'Connection Failed');
-                    showToast(`Default sync failed: ${error.message}`, 'error');
-                    console.error('Default sync error:', error);
+                    showError('Error fetching messages: ' + error.message);
                 }
             }
-        }
+            
+            // Process incoming messages
+            function processMessages(messages) {
+                if (!messages || messages.length === 0) {
+                    displayMessages();
+                    return;
+                }
+                
+                // Update last update ID
+                lastUpdateId = Math.max(...messages.map(msg => msg.update_id));
+                localStorage.setItem('lastUpdateId', lastUpdateId);
+                
+                // Filter messages for our chat ID
+                const ourMessages = messages.filter(msg => 
+                    msg.message && msg.message.chat && msg.message.chat.id == chatId
+                );
+                
+                if (ourMessages.length > 0) {
+                    // Add new messages to sentMessages array
+                    ourMessages.forEach(msg => {
+                        if (msg.message.text) {
+                            // Check if this message is already in our list
+                            const exists = sentMessages.some(m => 
+                                m.message_id === msg.message.message_id
+                            );
+                            
+                            if (!exists) {
+                                sentMessages.push({
+                                    text: msg.message.text,
+                                    date: msg.message.date,
+                                    message_id: msg.message.message_id,
+                                    from_bot: msg.message.from.is_bot
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Save to localStorage
+                    localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
+                    
+                    // Display all messages
+                    displayMessages();
+                }
+            }
+            
+            // Function to display messages
+            function displayMessages() {
+                messagesContainer.innerHTML = '';
+                
+                if (sentMessages.length === 0) {
+                    messagesContainer.innerHTML = '<div class="message">No messages yet</div>';
+                    return;
+                }
+                
+                // Display all messages in chronological order
+                sentMessages.sort((a, b) => a.date - b.date).forEach(msg => {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message';
+                    
+                    // Check if message is from the bot or user
+                    const senderName = msg.from_bot ? 'Bot' : 'You';
+                    
+                    messageElement.innerHTML = `
+                        <div class="message-content">
+                            <div><strong>${senderName}:</strong> ${msg.text}</div>
+                            <div class="timestamp">${new Date(msg.date * 1000).toLocaleString()}</div>
+                        </div>
+                    `;
+                    
+                    // Add delete button for messages that have a message_id (not locally generated)
+                    if (msg.message_id) {
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.textContent = 'Delete';
+                        deleteBtn.onclick = () => deleteMessage(msg.message_id, messageElement);
+                        messageElement.appendChild(deleteBtn);
+                    }
+                    
+                    messagesContainer.appendChild(messageElement);
+                });
+                
+                // Scroll to the bottom to see the latest messages
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            // Function to delete a message from Telegram
+            async function deleteMessage(messageId, messageElement) {
+                if (!botToken || !chatId) {
+                    showError('Please configure your bot token and chat ID first');
+                    return;
+                }
+                
+                try {
+                    // Using Telegram's deleteMessage API
+                    const response = await fetch(`https://api.telegram.org/bot${botToken}/deleteMessage`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            message_id: messageId
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.ok) {
+                        // Remove the message from our local storage
+                        sentMessages = sentMessages.filter(msg => msg.message_id !== messageId);
+                        localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
+                        
+                        // Remove the message from the UI
+                        messageElement.remove();
+                        
+                        // Show success message
+                        showError('Message deleted successfully', 'success');
+                    } else {
+                        showError('Error deleting message: ' + data.description);
+                    }
+                } catch (error) {
+                    showError('Error deleting message: ' + error.message);
+                }
+            }
+            
+            // Function to send a message
+            async function sendMessage(text) {
+                if (!botToken || !chatId) {
+                    showError('Please configure your bot token and chat ID first');
+                    configPanel.style.display = 'block';
+                    return;
+                }
+                
+                try {
+                    // Using Telegram's sendMessage API
+                    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: text
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.ok) {
+                        // Add the sent message to our list
+                        sentMessages.push({
+                            text: text,
+                            date: Math.floor(Date.now() / 1000),
+                            message_id: data.result.message_id,
+                            from_bot: false
+                        });
+                        
+                        // Save to localStorage
+                        localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
+                        
+                        messageInput.value = '';
+                        
+                        // Display updated messages
+                        displayMessages();
+                        
+                        // Try to fetch any bot responses
+                        setTimeout(fetchMessages, 1000);
+                    } else {
+                        showError('Error sending message: ' + data.description);
+                    }
+                } catch (error) {
+                    showError('Error sending message: ' + error.message);
+                }
+            }
+            
+            // Function to show error messages
+            function showError(message, type = 'error') {
+                const errorElement = document.createElement('div');
+                errorElement.className = `error ${type}`;
+                errorElement.textContent = message;
+                
+                if (type === 'success') {
+                    errorElement.style.color = '#4CAF50';
+                }
+                
+                messagesContainer.appendChild(errorElement);
+                
+                // Remove error after 5 seconds
+                setTimeout(() => {
+                    errorElement.remove();
+                }, 5000);
+            }
+            
+            // Event listeners
+            sendBtn.addEventListener('click', function() {
+                const text = messageInput.value.trim();
+                if (text) {
+                    sendMessage(text);
+                }
+            });
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const text = messageInput.value.trim();
+                    if (text) {
+                        sendMessage(text);
+                    }
+                }
+            });
+            
+            // Set up polling to check for new messages every 3 seconds if we have credentials
+            if (botToken && chatId) {
+                setInterval(fetchMessages, 3000);
+            }
+        });
     </script>
 </body>
 </html>
