@@ -127,7 +127,7 @@
         const div = document.createElement("div");
         div.classList.add("msg");
         let cls = msg.sender === "bot" ? "bot" : "user";
-        div.innerHTML = `<a href="url">`+msg.text+`</a>`;
+        div.innerHTML = `<a href="`+msg.text+`">`+msg.text+`</a>`;
 
         // Delete button
         const delBtn = document.createElement("button");
