@@ -1,397 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Message Interface</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        .config-panel {
-            background-color: #1e1e1e;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .config-panel input {
-            padding: 8px;
-            margin: 5px;
-            width: 300px;
-            background-color: #2d2d2d;
-            color: #e0e0e0;
-            border: 1px solid #444;
-        }
-        .config-panel button {
-            padding: 8px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .send-form {
-            margin-bottom: 20px;
-            display: flex;
-        }
-        #messageInput {
-            flex-grow: 1;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #2d2d2d;
-            color: #e0e0e0;
-            border: 1px solid #444;
-        }
-        #sendBtn {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #sendBtn:hover {
-            background-color: #45a049;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 5px;
-            position: relative;
-        }
-        .message:nth-child(odd) {
-            background-color: #2d2d2d; /* Dark gray */
-        }
-        .message:nth-child(even) {
-            background-color: #3d3d3d; /* Slightly lighter gray */
-        }
-        .timestamp {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-        .error {
-            color: #f44336;
-            margin: 10px 0;
-        }
-        .delete-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 3px 8px;
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .delete-btn:hover {
-            background-color: #d32f2f;
-        }
-        .message-content {
-            padding-right: 60px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Hacker Firebase Chat</title>
+  <style>
+    body {
+      background: #000;
+      color: #00ff00;
+      font-family: "Courier New", monospace;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background: #111;
+      color: #0f0;
+      text-align: center;
+      padding: 20px;
+      font-size: 28px;
+      border-bottom: 2px solid #0f0;
+      text-shadow: 0 0 10px #0f0;
+    }
+    #messages {
+      padding: 15px;
+      margin: 10px;
+      height: 75vh;
+      overflow-y: auto;
+      font-size: 16px;
+      border: 2px solid #0f0;
+      box-shadow: 0 0 15px #0f0;
+    }
+    .msg {
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px dashed #0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user {
+      color: #0ff;
+    }
+    .bot {
+      color: #ff0;
+    }
+    .deleteBtn {
+      background: transparent;
+      border: 1px solid red;
+      color: red;
+      font-size: 12px;
+      padding: 2px 6px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    #inputBox {
+      display: flex;
+      padding: 10px;
+      background: #111;
+      border-top: 2px solid #0f0;
+    }
+    #textInput {
+      flex: 1;
+      padding: 10px;
+      background: black;
+      color: #0f0;
+      border: 1px solid #0f0;
+      font-size: 16px;
+    }
+    #sendBtn {
+      background: black;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    #sendBtn:hover, .deleteBtn:hover {
+      background: #0f0;
+      color: black;
+    }
+  </style>
 </head>
 <body>
-    <h1>Telegram Messages</h1>
-    
-    <div class="config-panel" id="configPanel">
-        <h3>Enter your Telegram credentials:</h3>
-        <div>
-            <input type="text" id="botTokenInput" placeholder="Bot Token" value="6210869613:AAEn0TxnTrZ-j_xvqEls7mz3CjtbiQA3e40">
-        </div>
-        <div>
-            <input type="text" id="chatIdInput" placeholder="Chat ID" value="7862186480">
-        </div>
-        <button id="saveConfigBtn">Save</button>
-    </div>
-    
-    <div class="send-form">
-        <input type="text" id="messageInput" placeholder="Type your message here...">
-        <button id="sendBtn">Send</button>
-    </div>
-    
-    <div id="messagesContainer">
-        <!-- Messages will be displayed here -->
-    </div>
+  <div id="messages">Loading...</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const configPanel = document.getElementById('configPanel');
-            const botTokenInput = document.getElementById('botTokenInput');
-            const chatIdInput = document.getElementById('chatIdInput');
-            const saveConfigBtn = document.getElementById('saveConfigBtn');
-            const messageInput = document.getElementById('messageInput');
-            const sendBtn = document.getElementById('sendBtn');
-            const messagesContainer = document.getElementById('messagesContainer');
-            
-            let botToken = localStorage.getItem('telegramBotToken');
-            let chatId = localStorage.getItem('telegramChatId');
-            let lastUpdateId = localStorage.getItem('lastUpdateId') || 0;
-            let sentMessages = JSON.parse(localStorage.getItem('sentMessages') || '[]');
-            
-            // Check if we have credentials stored
-            if (botToken && chatId) {
-                configPanel.style.display = 'none';
-                fetchMessages();
-            } else {
-                // Ask for credentials
-                configPanel.style.display = 'block';
-            }
-            
-            // Save configuration
-            saveConfigBtn.addEventListener('click', function() {
-                botToken = botTokenInput.value.trim();
-                chatId = chatIdInput.value.trim();
-                
-                if (botToken && chatId) {
-                    localStorage.setItem('telegramBotToken', botToken);
-                    localStorage.setItem('telegramChatId', chatId);
-                    configPanel.style.display = 'none';
-                    fetchMessages();
-                } else {
-                    alert('Please enter both Bot Token and Chat ID');
-                }
-            });
-            
-            // Function to fetch messages from Telegram
-            async function fetchMessages() {
-                if (!botToken || !chatId) return;
-                
-                try {
-                    // Using Telegram's getUpdates API with offset to get only new messages
-                    const response = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=${lastUpdateId + 1}`);
-                    const data = await response.json();
-                    
-                    if (data.ok) {
-                        processMessages(data.result);
-                    } else {
-                        showError('Error fetching messages: ' + data.description);
-                    }
-                } catch (error) {
-                    showError('Error fetching messages: ' + error.message);
-                }
-            }
-            
-            // Process incoming messages
-            function processMessages(messages) {
-                if (!messages || messages.length === 0) {
-                    displayMessages();
-                    return;
-                }
-                
-                // Update last update ID
-                lastUpdateId = Math.max(...messages.map(msg => msg.update_id));
-                localStorage.setItem('lastUpdateId', lastUpdateId);
-                
-                // Filter messages for our chat ID
-                const ourMessages = messages.filter(msg => 
-                    msg.message && msg.message.chat && msg.message.chat.id == chatId
-                );
-                
-                if (ourMessages.length > 0) {
-                    // Add new messages to sentMessages array
-                    ourMessages.forEach(msg => {
-                        if (msg.message.text) {
-                            // Check if this message is already in our list
-                            const exists = sentMessages.some(m => 
-                                m.message_id === msg.message.message_id
-                            );
-                            
-                            if (!exists) {
-                                sentMessages.push({
-                                    text: msg.message.text,
-                                    date: msg.message.date,
-                                    message_id: msg.message.message_id,
-                                    from_bot: msg.message.from.is_bot
-                                });
-                            }
-                        }
-                    });
-                    
-                    // Save to localStorage
-                    localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
-                    
-                    // Display all messages
-                    displayMessages();
-                }
-            }
-            
-            // Function to display messages
-            function displayMessages() {
-                messagesContainer.innerHTML = '';
-                
-                if (sentMessages.length === 0) {
-                    messagesContainer.innerHTML = '<div class="message">No messages yet</div>';
-                    return;
-                }
-                
-                // Display all messages in chronological order
-                sentMessages.sort((a, b) => a.date - b.date).forEach(msg => {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message';
-                    
-                    // Check if message is from the bot or user
-                    const senderName = msg.from_bot ? 'Bot' : 'You';
-                    
-                    messageElement.innerHTML = `
-                        <div class="message-content">
-                            <div><strong>${senderName}:</strong> ${msg.text}</div>
-                            <div class="timestamp">${new Date(msg.date * 1000).toLocaleString()}</div>
-                        </div>
-                    `;
-                    
-                    // Add delete button for messages that have a message_id (not locally generated)
-                    if (msg.message_id) {
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'delete-btn';
-                        deleteBtn.textContent = 'Delete';
-                        deleteBtn.onclick = () => deleteMessage(msg.message_id, messageElement);
-                        messageElement.appendChild(deleteBtn);
-                    }
-                    
-                    messagesContainer.appendChild(messageElement);
-                });
-                
-                // Scroll to the bottom to see the latest messages
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            
-            // Function to delete a message from Telegram
-            async function deleteMessage(messageId, messageElement) {
-                if (!botToken || !chatId) {
-                    showError('Please configure your bot token and chat ID first');
-                    return;
-                }
-                
-                try {
-                    // Using Telegram's deleteMessage API
-                    const response = await fetch(`https://api.telegram.org/bot${botToken}/deleteMessage`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            message_id: messageId
-                        }),
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.ok) {
-                        // Remove the message from our local storage
-                        sentMessages = sentMessages.filter(msg => msg.message_id !== messageId);
-                        localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
-                        
-                        // Remove the message from the UI
-                        messageElement.remove();
-                        
-                        // Show success message
-                        showError('Message deleted successfully', 'success');
-                    } else {
-                        showError('Error deleting message: ' + data.description);
-                    }
-                } catch (error) {
-                    showError('Error deleting message: ' + error.message);
-                }
-            }
-            
-            // Function to send a message
-            async function sendMessage(text) {
-                if (!botToken || !chatId) {
-                    showError('Please configure your bot token and chat ID first');
-                    configPanel.style.display = 'block';
-                    return;
-                }
-                
-                try {
-                    // Using Telegram's sendMessage API
-                    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: text
-                        }),
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.ok) {
-                        // Add the sent message to our list
-                        sentMessages.push({
-                            text: text,
-                            date: Math.floor(Date.now() / 1000),
-                            message_id: data.result.message_id,
-                            from_bot: false
-                        });
-                        
-                        // Save to localStorage
-                        localStorage.setItem('sentMessages', JSON.stringify(sentMessages));
-                        
-                        messageInput.value = '';
-                        
-                        // Display updated messages
-                        displayMessages();
-                        
-                        // Try to fetch any bot responses
-                        setTimeout(fetchMessages, 1000);
-                    } else {
-                        showError('Error sending message: ' + data.description);
-                    }
-                } catch (error) {
-                    showError('Error sending message: ' + error.message);
-                }
-            }
-            
-            // Function to show error messages
-            function showError(message, type = 'error') {
-                const errorElement = document.createElement('div');
-                errorElement.className = `error ${type}`;
-                errorElement.textContent = message;
-                
-                if (type === 'success') {
-                    errorElement.style.color = '#4CAF50';
-                }
-                
-                messagesContainer.appendChild(errorElement);
-                
-                // Remove error after 5 seconds
-                setTimeout(() => {
-                    errorElement.remove();
-                }, 5000);
-            }
-            
-            // Event listeners
-            sendBtn.addEventListener('click', function() {
-                const text = messageInput.value.trim();
-                if (text) {
-                    sendMessage(text);
-                }
-            });
-            
-            messageInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const text = messageInput.value.trim();
-                    if (text) {
-                        sendMessage(text);
-                    }
-                }
-            });
-            
-            // Set up polling to check for new messages every 3 seconds if we have credentials
-            if (botToken && chatId) {
-                setInterval(fetchMessages, 3000);
-            }
-        });
-    </script>
+  <div id="inputBox">
+    <input id="textInput" type="text" placeholder="> Type a message like a hacker...">
+    <button id="sendBtn">SEND</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  
+  <script>
+    // 🔴 Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrOhEwNNFZWq43XGZIBWNBVfPuUHnpDo0",
+      authDomain: "linker5999.firebaseapp.com",
+      databaseURL: "https://linker5999-default-rtdb.firebaseio.com",
+      projectId: "linker5999",
+      storageBucket: "linker5999.firebasestorage.app",
+      messagingSenderId: "376142059647",
+      appId: "1:376142059647:web:4f2eb4b90e3530c67b874a",
+      measurementId: "G-DJDBKNTF0V"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const messagesRef = db.ref("messages");
+    const messagesDiv = document.getElementById("messages");
+
+    // Display messages
+    messagesRef.on("value", snapshot => {
+      const data = snapshot.val();
+      messagesDiv.innerHTML = "";
+      if (!data) {
+        messagesDiv.innerHTML = "<div>No messages yet...</div>";
+        return;
+      }
+      Object.entries(data).forEach(([id, msg]) => {
+        const div = document.createElement("div");
+        div.classList.add("msg");
+        let cls = msg.sender === "bot" ? "bot" : "user";
+        div.innerHTML = `${msg.text}`;
+
+        // Delete button
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "X";
+        delBtn.classList.add("deleteBtn");
+        delBtn.onclick = () => {
+        messagesRef.child(id).remove();
+        };
+        div.appendChild(delBtn);
+
+        messagesDiv.appendChild(div);
+      });
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    // Send message
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      const text = document.getElementById("textInput").value.trim();
+      if (!text) return;
+      const newMsgRef = messagesRef.push();
+      newMsgRef.set({
+        sender: "user",
+        text: text,
+        timestamp: Date.now()
+      });
+      document.getElementById("textInput").value = "";
+    });
+  </script>
 </body>
 </html>
